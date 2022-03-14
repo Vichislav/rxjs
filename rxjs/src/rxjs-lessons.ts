@@ -3,14 +3,40 @@ import {debounceTime, distinctUntilChanged, fromEvent, map, observable, Observab
 // знак $ в конце слова это признак Observable
 const search$ = new Observable<Event>(observer => {
   const search = document.getElementById("212");
+  const stop = document.getElementById("stop");
 
-  if (!search) {
+  if (!search || !stop) {
     observer.error('Element does not exist on the page');
     return; // return пишем что бы не производить подписку на null (не идти дальше)
   }
-  search.addEventListener('input', event => {
+
+  // @ts-ignore
+  const onSearch = event => {
+    console.log(123);
+    chekSubscription();
     observer.next(event);
-  });
+  };
+
+  // @ts-ignore
+  const onStop = event => {
+    chekSubscription();
+    observer.complete();
+    clear();
+  };
+
+  search.addEventListener('input', onSearch);
+  stop.addEventListener('click', onStop);
+
+  const chekSubscription = () => {
+    if (observer.closed) {
+      clear();
+    }
+  };
+
+  const clear = () => {
+    search.removeEventListener('input', onSearch);
+    stop.removeEventListener('click', onStop);
+  };
 });
 
 //тоже самое чт вверху только реализовано при помощи RxJs
@@ -19,7 +45,7 @@ const search$ = new Observable<Event>(observer => {
 // @ts-ignore
 //const search$ : Observable<Event> = fromEvent<Event>(document.getElementById('212'), 'input');
 
-search$.pipe(
+const searchSubscription = search$.pipe(
   map(event => {
     //здесь мы уточняем тип value как HTMLInputElement
     return (event.target as HTMLInputElement).value; // для того что бы возвращать слово а не букву
@@ -35,6 +61,12 @@ search$.pipe(
 ).subscribe( value => {
   console.log(value);
 });
+
+setTimeout(() =>{
+  console.log('unsubscribe');
+  searchSubscription.unsubscribe();
+}, 10000)
+
 
 /*короткая запись subscribe */
 /*search$.subscribe( value => {
@@ -53,5 +85,3 @@ search$.pipe(
     console.log('Event end')
   }
 });*/
-
-
