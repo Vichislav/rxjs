@@ -5,6 +5,7 @@ import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 
 import './rxjs-lessons';
+import './canvas';
 
 if (environment.production) {
   enableProdMode();
