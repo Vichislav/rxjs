@@ -1,6 +1,6 @@
 import {debounceTime, distinctUntilChanged, fromEvent, map, observable, Observable} from "rxjs";
 
-/*// знак $ в конце слова это признак Observable
+// знак $ в конце слова это признак Observable
 const search$ = new Observable<Event>(observer => {
   const search = document.getElementById("212");
 
@@ -11,13 +11,13 @@ const search$ = new Observable<Event>(observer => {
   search.addEventListener('input', event => {
     observer.next(event);
   });
-});*/
+});
 
 //тоже самое чт вверху только реализовано при помощи RxJs
 // fromEvent из элемента типа <Event>, на элементе document... хочу получить
 //событие input. Observable<Event> это я так понял типизация search$
 // @ts-ignore
-const search$ : Observable<Event> = fromEvent<Event>(document.getElementById('212'), 'input');
+//const search$ : Observable<Event> = fromEvent<Event>(document.getElementById('212'), 'input');
 
 search$.pipe(
   map(event => {
