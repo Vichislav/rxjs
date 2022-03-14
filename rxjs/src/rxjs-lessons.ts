@@ -1,6 +1,6 @@
-import {debounceTime, distinctUntilChanged, fromEvent, map, observable, Observable} from "rxjs";
+import {debounceTime, distinctUntilChanged, fromEvent, map, observable, Observable, takeUntil} from "rxjs";
 
-// знак $ в конце слова это признак Observable
+/*// знак $ в конце слова это признак Observable
 const search$ = new Observable<Event>(observer => {
   const search = document.getElementById("212");
   const stop = document.getElementById("stop");
@@ -37,13 +37,16 @@ const search$ = new Observable<Event>(observer => {
     search.removeEventListener('input', onSearch);
     stop.removeEventListener('click', onStop);
   };
-});
+});*/
 
 //тоже самое чт вверху только реализовано при помощи RxJs
 // fromEvent из элемента типа <Event>, на элементе document... хочу получить
 //событие input. Observable<Event> это я так понял типизация search$
 // @ts-ignore
-//const search$ : Observable<Event> = fromEvent<Event>(document.getElementById('212'), 'input');
+const search$ : Observable<Event> = fromEvent<Event>(document.getElementById('212'), 'input');
+
+// @ts-ignore  (без него есть ошибка)
+const stop$ : Observable<Event> = fromEvent<Event>(document.getElementById('stop'), 'click');
 
 const searchSubscription = search$.pipe(
   map(event => {
@@ -56,11 +59,14 @@ const searchSubscription = search$.pipe(
   // отбразиться в input только тогда, когда символов будет 4 и более
   map(value => value.length > 3 ? value : ''),
   // что бы не повторять запрос при одном и том же слове
-  distinctUntilChanged()
+  distinctUntilChanged(),
+  //работай покуда не сработает поток stop$ (пока мы не нажмем на кнопку)
+  takeUntil(stop$),
   // подписываемся на событие search$ (см вверх) получаем value и выводим его в консоль
 ).subscribe( value => {
   console.log(value);
 });
+
 
 setTimeout(() =>{
   console.log('unsubscribe');
